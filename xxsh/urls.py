@@ -22,12 +22,22 @@ xadmin.autodiscover()
 
 from xadmin.plugins import xversion
 xversion.register_models()
+from frontEndInterface.views import *
 
 urlpatterns = [
     url(r'xadmin/', include(xadmin.site.urls)),
-    url(r'index/$', 'frontEndInterface.views.index'),
-    url(r'xnews/(.*)', 'frontEndInterface.views.xnews'),
-    url(r'snews/(.*)', 'frontEndInterface.views.snews'),
-    url(r'safegaurd/', 'frontEndInterface.views.safegaurd'),
-    url(r'apply/', 'frontEndInterface.views.apply'),
+    url(r'index/$', index, name='index'),
+    url(r'xnews/(.*)', xnews, name='xnews'),
+    url(r'snews/(.*)', snews, name='snews'),
+    url(r'safegaurd/', safegaurd, name='safegaurd'),
+    url(r'apply/', apply, name='apply'),
+    url(r'pic/', wonder_image, name='wonder_image'),
+    url(r'department/(.*)', show_department, name='department'),
+    url(r'images/', wonder_image),
+    url(r'videos/', wonder_image),
+    url(r'academy/(.*)', show_academy),
+    url(r'rights/(.*)', show_rights),
+    url(r'thoughts/(.*)', show_thoughts),
+    url(r'stars/(.*)', show_stars),
+
 ]

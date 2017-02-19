@@ -3,12 +3,14 @@ from django.db import models
 from django.utils.datetime_safe import datetime
 
 
+
 # Create your models here.
 
 
 class Department(models.Model):
     name = models.CharField(max_length=20, default='部门的名字')
     introduction = models.TextField(default='这是简介')
+    image = models.ImageField(upload_to='static/xxsh/department')
 
     def __unicode__(self):
         return self.name
@@ -146,6 +148,7 @@ class SomeElse(models.Model):
 class Star(models.Model):  # 某月之星
     content = models.CharField(max_length=200)
     image = models.ImageField(upload_to='static/xxsh/star', default=None)
+    text = models.TextField(default='')
 
     def __unicode__(self):
         return self.content
@@ -173,6 +176,8 @@ class WondPicture(models.Model):
 class Academy(models.Model):
     title = models.CharField(max_length=100, default="学术那一栏要填充的字符")
     url = models.CharField(max_length=200, default="这个学术所指向的url")
+    text = models.TextField(default="学术那一栏要填充的字符")
+    datetime = models.DateTimeField(default=datetime.now())
 
     def __unicode__(self):
         return self.title
@@ -181,6 +186,8 @@ class Academy(models.Model):
 class Rights(models.Model):
     title = models.CharField(max_length=100, default="权益那一栏要填充的字符")
     url = models.CharField(max_length=200, default="这个权益字段所指向的url")
+    text = models.TextField(default="权益那一栏要填充的字符")
+    datetime = models.DateTimeField(default=datetime.now())
 
     def __unicode__(self):
         return self.title
@@ -189,6 +196,8 @@ class Rights(models.Model):
 class Thoughts(models.Model):
     title = models.CharField(max_length=100, default="思潮那一栏要填充的字符")
     url = models.CharField(max_length=200, default="这个思潮字段所指向的url")
+    text = models.TextField(default="思潮那一栏要填充的字符")
+    datetime = models.DateTimeField(default=datetime.now())
 
     def __unicode__(self):
         return self.title
