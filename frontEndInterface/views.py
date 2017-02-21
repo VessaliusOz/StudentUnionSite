@@ -1,16 +1,10 @@
-# coding=utf-8生气生
-
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.http import HttpResponse
-from frontEndInterface.models import *
-from django.utils import timezone
-from frontEndInterface.tools import static_url_handle
+# coding=utf-8
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from models import *
+from tools import static_url_handle
+
 import json
-
-
-# Create your views here.
 
 
 def index(request):
