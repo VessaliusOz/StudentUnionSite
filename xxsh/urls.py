@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 import xadmin
@@ -22,6 +24,8 @@ xadmin.autodiscover()
 
 from xadmin.plugins import xversion
 xversion.register_models()
+
+
 from frontEndInterface.views import *
 
 urlpatterns = [
@@ -29,15 +33,21 @@ urlpatterns = [
     url(r'index/$', index, name='index'),
     url(r'xnews/(.*)', xnews, name='xnews'),
     url(r'snews/(.*)', snews, name='snews'),
+    url(r'information/(.*)', show_information, name='show_information'),
     url(r'safegaurd/', safegaurd, name='safegaurd'),
     url(r'apply/', apply, name='apply'),
+    url(r'fixserver/', fix_server, name='fix_server'),
     url(r'pic/', wonder_image, name='wonder_image'),
-    url(r'department/(.*)', show_department, name='department'),
+    url(r'^department/(.*)', show_department, name='department'),
+    url(r'departmentframework/', show_framework, name='show_framework'),
     url(r'images/', wonder_image),
     url(r'videos/', wonder_image),
     url(r'academy/(.*)', show_academy),
     url(r'rights/(.*)', show_rights),
     url(r'thoughts/(.*)', show_thoughts),
     url(r'stars/(.*)', show_stars),
+    url(r'schools/(.*)', show_schools),
+    url(r'course/', show_course),
+    url(r'^ueditor/', include('DjangoUeditor.urls')),
 
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

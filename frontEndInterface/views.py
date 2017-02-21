@@ -46,6 +46,8 @@ def index(request):
 
             # 把东西放到list里面去
             ret_xnews_list.append(ele_dict)
+            if len(ret_xnews_list) == 8:
+                break
         # 把list放到返回的大字典里面去
         ret_dict['xNews'] = ret_xnews_list
 
@@ -65,7 +67,10 @@ def index(request):
             title = snew.title
             ele_dict['title'] = title
 
-            ret_xnews_list.append(ele_dict)
+            ret_snews_list.append(ele_dict)
+            if len(ret_snews_list) == 8:
+                break
+
         ret_dict['sNews'] = ret_snews_list
 
         # 信息公告
@@ -83,6 +88,8 @@ def index(request):
             ele_dict['title'] = title
 
             ret_info_list.append(ele_dict)
+            if len(ret_info_list) == 8:
+                break
         ret_dict['information'] = ret_info_list
 
         # 学联活动推荐
@@ -90,6 +97,7 @@ def index(request):
         for xact in X_activity.objects.all().order_by('datetime')[0:4]:
             ele_dict = {}
             ele_dict['title'] = xact.name
+            ele_dict['url'] = static_url_handle(xact.image.url)
 
             ret_xact_list.append(ele_dict)
         ret_dict['xActivity'] = ret_xact_list
@@ -232,6 +240,40 @@ def xnews(request, dynamic_news_url=None):
         return HttpResponse('fail, wrong request method')
 
 
+def show_information(request, dynamic_news_url=None):
+    if request.method == 'GET':
+        if not dynamic_news_url:
+            # 动态url为空的情况，赋予列表
+            ret_list = []
+            for notice in Information.objects.all().order_by('datetime'):
+                ele_dict = {}
+                ele_dict['title'] = notice.title
+                ele_dict['datetime'] = notice.datetime.strftime(("%Y-%m-%d %H:%M"))
+                ret_list.append(ele_dict)
+            # json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            return JsonResponse({'information': ret_list})
+            # return HttpResponse(json_data, content_type="application/json")
+
+        else:
+            notice = Information.objects.get(title=dynamic_news_url)
+            notice.view_num += 1
+            notice.save()
+            ret_dict = {}
+            ret_dict['title'] = notice.title
+            ret_dict['body'] = notice.body
+            ret_dict['image'] = notice.image.url
+
+            ret_dict['excEditor'] = notice.exc_editor
+            ret_dict['dutyEditor'] = notice.duty_editor
+            ret_dict['viewNum'] = notice.view_num
+            ret_dict['datetime'] = notice.datetime.strftime(("%Y-%m-%d %H:%M"))
+            json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse(ret_dict)
+            return HttpResponse(json_file, content_type="application/json")
+    else:
+        return HttpResponse('fail, wrong request method')
+
+
 @csrf_exempt  # 维权
 def safegaurd(request):
     if request.method == 'POST':
@@ -268,6 +310,26 @@ def apply(request):
         return HttpResponse('fail, method wrong')
 
 
+def fix_server(request):
+    if request.method == 'POST':
+        try:
+            name = request.POST.get('name', '')
+            title = request.POST.get('title', '')
+            text = request.POST.get('text', '')
+            try:
+                image = request.FILES['image']
+            except:
+                image = None
+            FixServer.objects.create(name=name, title=title, text=text, image=image)
+            return JsonResponse({'status':'success'})
+        except:
+            return HttpResponse('参数不全')
+    else:
+        return HttpResponse('fail, method wrong')
+
+
+
+
 def wonder_image(request):
     if request.method == 'GET':
         ret_list = []
@@ -299,7 +361,11 @@ def show_department(request, dynamic_dap_url=None):
                 dep_dict['name'] = department.name
                 dep_dict['introduction'] = department.introduction
                 ret_list.append(dep_dict)
-            json_data = json.dumps({'department': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            organization_framework_image = static_url_handle(SomeElse.objects.all()[0].organization_framework_image.url)
+            organization_framework_text = SomeElse.objects.all()[0].organization_framework_text
+            json_data = json.dumps({'department': ret_list, "framework_image": organization_framework_image,
+                                    "framework_text": organization_framework_text
+                                    }, ensure_ascii=False, sort_keys=True, indent=4)
             return HttpResponse(json_data, content_type="application/json")
         else:
             department_name = dynamic_dap_url.split('/')
@@ -332,10 +398,12 @@ def show_department(request, dynamic_dap_url=None):
                     act_dict = {}
                     act_dict['title'] = activity.name
                     activity_list.append(act_dict)
-                json_data = json.dumps({'staffs': staff_list, 'news': news_list, 'activity': activity_list},
+                chef = Chef.objects.get(if_chef_now=True)
+                json_data = json.dumps({'chef': chef.name, 'staffs': staff_list, 'news': news_list, 'activity': activity_list},
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
-            else:
+
+            elif department_name[1] == 'staff':
                 department = Department.objects.get(name=department_name[0])
                 staff = department.staff_set.get(name=department_name[2])
                 staff_dict = {}
@@ -349,18 +417,63 @@ def show_department(request, dynamic_dap_url=None):
                 json_data = json.dumps(staff_dict,
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
+
+            elif department_name[1] == 'chef':
+                department = Department.objects.get(name=department_name[0])
+                chef = department.chef_set.get(name=department_name[2])
+                chef_dict={}
+                chef_dict['name'] = chef.name
+                chef_dict['grade'] = chef.grade
+
+                chef_dict['introduction'] = chef.introduction
+                chef_dict['department'] = chef.department.name
+                chef_dict['chef_now'] = chef.chef_now
+                chef_dict['imageUrl'] = static_url_handle(chef.image.url)
+                json_data = json.dumps(chef_dict,
+                                       ensure_ascii=False, sort_keys=True, indent=4)
+                return HttpResponse(json_data, content_type="application/json")
+
+            elif department_name[1] == 'chefs':
+                department = Department.objects.get(name=department_name[0])
+                chefs = department.chef_set.all().order_by('datetime')
+                chefs_dict = {}
+                chefs_list = []
+                for chef in chefs:
+                    chefs_dict['name'] = chef.name
+                    chefs_dict['if_chef_now'] = chef.if_chef_now
+                    chefs_dict['introduction'] = chef.introduction
+                    chefs_dict['grade'] = chef.grade
+                    chefs_dict['departmrnt'] = chef.department.name
+                    chefs_list.append(chefs_dict)
+                json_data = json.dumps({'chefs': chefs_dict},
+                                       ensure_ascii=False, sort_keys=True, indent=4)
+                return HttpResponse(json_data, content_type="application/json")
+
+
+            else:
+                return HttpResponse('wwwwwwwwwwrong url')
     else:
         return HttpResponse('fail, wrong request method')
 
 
+def show_framework(request):
+    organization_framework_image = static_url_handle(SomeElse.objects.all()[0].organization_framework_image.url)
+    organization_framework_text = SomeElse.objects.all()[0].organization_framework_text
+    json_data = json.dumps({"framework_image": organization_framework_image,
+                            "framework_text": organization_framework_text
+                            }, ensure_ascii=False, sort_keys=True, indent=4)
+    return HttpResponse(json_data, content_type="application/json")
+
+
+
 # 合作交流
+
 def show_academy(request, dynamic_news_url=None):
-    academy_list = Academy.objects.all()
     if request.method == 'GET':
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in Academy.objects.all().order_by('datetime')[0:3]:
+            for new in Academy.objects.all().order_by('datetime'):
                 ele_dict = {}
                 # deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
                 # if deltatime.days >= 7:
@@ -370,17 +483,39 @@ def show_academy(request, dynamic_news_url=None):
                 # ele_dict['newFlag'] = new_flag
                 ele_dict['title'] = new.title
                 ele_dict['url'] = new.url
-                ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d-%H:%M"))
+                ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
                 ele_dict['text'] = new.text
                 ret_list.append(ele_dict)
-            json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            json_data = json.dumps({'academy': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse({'news': ret_list})
             return HttpResponse(json_data, content_type="application/json")
 
         else:
-            return HttpResponse('wrong url')
+            academy = Academy.objects.get(title=dynamic_news_url)
+            ret_dict = {}
+            ret_dict['url'] = academy.url
+            ret_dict['text'] = academy.text
+            ret_dict['title'] = academy.title
+            ret_dict['datetime'] = academy.datetime.strftime(("%Y-%m-%d %H:%M"))
+            json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse(ret_dict)
+            return HttpResponse(json_file, content_type="application/json")
+
     else:
         return HttpResponse('fail, wrong request method')
+
+
+# title = models.CharField(max_length=100, default="学术那一栏要填充的字符")
+#     url = models.CharField(max_length=200, default="这个学术所指向的url")
+#     text = models.TextField(default="学术那一栏要填充的字符")
+#     datetime = models.DateTimeField(default=datetime.now())
+#
+#     class Meta:
+#         verbose_name = u'学术'
+#         verbose_name_plural = u'学术'
+#
+#     def __unicode__(self):
+#         return self.title
 
 
 def show_rights(request, dynamic_news_url=None):
@@ -401,12 +536,20 @@ def show_rights(request, dynamic_news_url=None):
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d-%H:%M"))
                 ele_dict['text'] = new.text
                 ret_list.append(ele_dict)
-            json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            json_data = json.dumps({'rights': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse({'news': ret_list})
             return HttpResponse(json_data, content_type="application/json")
 
         else:
-            return HttpResponse('wrong url')
+            right = Rights.objects.get(title=dynamic_news_url)
+            ret_dict = {}
+            ret_dict['url'] = right.url
+            ret_dict['text'] = right.text
+            ret_dict['title'] = right.title
+            ret_dict['datetime'] = right.datetime.strftime(("%Y-%m-%d %H:%M"))
+            json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse(ret_dict)
+            return HttpResponse(json_file, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
 
@@ -429,12 +572,20 @@ def show_thoughts(request, dynamic_news_url=None):
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d-%H:%M"))
                 ele_dict['text'] = new.text
                 ret_list.append(ele_dict)
-            json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            json_data = json.dumps({'thoughts': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse({'news': ret_list})
             return HttpResponse(json_data, content_type="application/json")
 
         else:
-            return HttpResponse('wrong url')
+            thought = Thoughts.objects.get(title=dynamic_news_url)
+            ret_dict = {}
+            ret_dict['url'] = thought.url
+            ret_dict['text'] = thought.text
+            ret_dict['title'] = thought.title
+            ret_dict['datetime'] = thought.datetime.strftime(("%Y-%m-%d %H:%M"))
+            json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse(ret_dict)
+            return HttpResponse(json_file, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
 
@@ -473,13 +624,59 @@ def show_stars(request, dynamic_url=None):
         return HttpResponse('fail, wrong request method')
 
 
-        # class Star(models.Model):  # 某月之星
-        #     content = models.CharField(max_length=200)
-        #     image = models.ImageField(upload_to='static/xxsh/star', default=None)
-        #
-        #     def __unicode__(self):
-        #         return self.content
+def show_schools(request, dynamic_url=None):
+    if request.method == 'GET':
+        if not dynamic_url:
+            ret_list = []
+            for school in School.objects.all():
+                ele_dict = {}
+                ele_dict['name'] = school.name
+                ele_dict['introduction'] = school.introduction
+                ele_dict['chef'] = school.chef
+                ele_dict['chef_introduction'] = school.chef_introduction
+                ret_list.append(ele_dict)
+            system_brief_image = static_url_handle(SomeElse.objects.all()[0].school_system_brief_image.url)
+            system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
+            json_data = json.dumps({'schools': ret_list, 'system_brief_image': system_brief_image,
+                                    'system_brief_text':system_brief_text}, ensure_ascii=False, sort_keys=True, indent=4)
+            return HttpResponse(json_data, content_type="application/json")
+
+        else:
+            school_name = dynamic_url.split('/')
+            if len(list(school_name)) == 1 and school_name[0] != 'brief':
+                school = School.objects.get(name=school_name[0])
+                ret_dict = {}
+                ret_dict['name'] = school.name
+                ret_dict['introcduction'] = school.introduction
+                ret_dict['chef'] = school.chef
+                ret_dict['chef_introduction'] = school.chef_introduction
+                json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
+                return HttpResponse(json_file, content_type="application/json")
+            else:
+                system_brief_image = static_url_handle(SomeElse.objects.all()[0].school_system_brief_image.url)
+                system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
+                json_data = json.dumps({'system_brief_image': system_brief_image, 'system_brief_text':system_brief_text}
+                                       , ensure_ascii=False, sort_keys=True, indent=4)
+                return HttpResponse(json_data, content_type="application/json")
+    else:
+        return HttpResponse('fail, wrong request method')
 
 
-def show_structure(request):
-    pass
+def show_course(request):
+    if request.method == 'GET':
+        all_course = Course.objects.all()
+        course_list = []
+        for course in all_course:
+            course_dict={}
+            course_dict['name'] = course.course_name
+            course_dict['fileUrl'] = [{'filename': file.file_name, 'url': static_url_handle(file.file.url)}
+                                      for file in course.coursefile_set.all()]
+            course_list.append(course_dict)
+        json_data = json.dumps({'course': course_list}, ensure_ascii=False, sort_keys=True, indent=4)
+        return HttpResponse(json_data, content_type="application/json")
+    else:
+        return HttpResponse('fail , method wrong')
+
+
+
+
