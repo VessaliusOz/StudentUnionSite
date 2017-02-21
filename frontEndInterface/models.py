@@ -2,13 +2,21 @@
 from django.db import models
 from django.utils.datetime_safe import datetime
 from DjangoUeditor.models import UEditorField
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
 
 
 # Create your models here.
 class Department(models.Model):
     name = models.CharField(max_length=20, default='部门的名字')
     introduction = models.TextField(default='这是简介')
+<<<<<<< HEAD
     image = models.ImageField(upload_to='department', default=None, null=True)
+=======
+    image = models.ImageField(upload_to='static/xxsh/department', default=None, null=True)
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
 
     class Meta:
         verbose_name = u'部门'
@@ -16,6 +24,7 @@ class Department(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 
 class Staff(models.Model):
@@ -40,7 +49,11 @@ class Chef(models.Model):
     name = models.CharField(max_length=20, default='部长的名字')
     if_chef_now = models.BooleanField(default=False)
     introduction = models.TextField(default='introduction')
+<<<<<<< HEAD
     image = models.ImageField(upload_to='chef', default=None, null=True)
+=======
+    image = models.ImageField(upload_to='static/xxsh/department', default=None, null=True)
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     grade = models.CharField(max_length=20, default='')
     department = models.ForeignKey(Department)
     datetime = models.DateTimeField(default=datetime.now())
@@ -135,7 +148,11 @@ class Information(models.Model):
     datetime = models.DateTimeField(default=datetime.now())
     view_num = models.IntegerField(default=0)
     title = models.CharField(max_length=100)
+<<<<<<< HEAD
     image = models.ImageField(upload_to='information', default=None, blank=True, null=True)
+=======
+    image = models.ImageField(upload_to='static/xxsh/information', default=None, blank=True, null=True)
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     body = models.TextField()
     exc_editor = models.CharField(max_length=20, default='本公告执行编辑')
     duty_editor = models.CharField(max_length=20, default='本公告责任编辑')
@@ -151,7 +168,11 @@ class Information(models.Model):
 class Notice(models.Model):
     datetime = models.DateTimeField(default=datetime.now())
     title = models.CharField(max_length=100)
+<<<<<<< HEAD
     image = models.ImageField(upload_to='information', default=None)
+=======
+    image = models.ImageField(upload_to='static/xxsh/information', default=None)
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     body = models.TextField()
     exc_editor = models.CharField(max_length=20, default='本公告执行编辑')
     duty_editor = models.CharField(max_length=20, default='本公告责任编辑')
@@ -194,7 +215,11 @@ class FixServer(models.Model):
     name = models.CharField(max_length=100, default=None, null=True, blank=True)
     title = models.CharField(max_length=100, default=None,null=True, blank=True)
     text = models.TextField(default=None, null=True)
+<<<<<<< HEAD
     image = models.ImageField(upload_to='fixServer', default=None, blank=True, null=True)
+=======
+    image = models.ImageField(upload_to='static/xxsh/Fixserver', default=None, blank=True, null=True)
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     datetime = models.DateTimeField(default=datetime.now())
 
     class Meta:
@@ -224,13 +249,21 @@ class Safeguard(models.Model):
 
 class SomeElse(models.Model):
     group_frame = models.ImageField()
+<<<<<<< HEAD
     school_system_brief_image = models.ImageField(upload_to='school_system',
+=======
+    school_system_brief_image = models.ImageField(upload_to='static/xxsh/school_system',
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
                                                   default=None, null=True, blank=True)
     school_system_brief_text = models.TextField(default=None, null=True, blank=True)
     organization_framework_text = UEditorField(u'校学生会组织架构 ', width=600, height=300, toolbars="full", imagePath="",
                                             filePath="", upload_settings={"imageMaxSize":1204000},
                                             settings={}, command=None, blank=True)
+<<<<<<< HEAD
     organization_framework_image = models.ImageField(upload_to='organizatin_framework',
+=======
+    organization_framework_image = models.ImageField(upload_to='static/xxsh/organizatin_framework',
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
                                                   default=None, null=True, blank=True)
 
     class Meta:
@@ -273,6 +306,10 @@ class WondPicture(models.Model):
     title = models.CharField(max_length=100, default="图片的标题，不要超过100个字")
     upload_time = models.DateTimeField(default=datetime.now())
     image = models.ImageField(upload_to='wonderful_picture')
+
+    class Meta:
+        verbose_name = u'图片'
+        verbose_name_plural = u'图片'
 
     class Meta:
         verbose_name = u'图片'
@@ -337,7 +374,11 @@ class Course(models.Model):
 
 class CourseFile(models.Model):
     course = models.ForeignKey(Course, verbose_name='课程')
+<<<<<<< HEAD
     file = models.FileField(upload_to='course_file', verbose_name='文档')
+=======
+    file = models.FileField(upload_to='static/xxsh/files', verbose_name='文档')
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     file_name = models.CharField(max_length=20, verbose_name='文档名称', default='文档名称')
 
     class Meta:
@@ -349,4 +390,8 @@ class CourseFile(models.Model):
 
 
 class TestImage(models.Model):
+<<<<<<< HEAD
     Image_x = models.ImageField(upload_to='image', blank=True, null=True)
+=======
+    Image_x = models.ImageField(upload_to='static/xxsh/files', blank=True, null=True)
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda

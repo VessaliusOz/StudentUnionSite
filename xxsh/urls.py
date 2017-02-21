@@ -22,9 +22,12 @@ from django.conf import settings
 import xadmin
 xadmin.autodiscover()
 
+<<<<<<< HEAD
 from xadmin.plugins import xversion
 xversion.register_models()
 
+=======
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
 
 from frontEndInterface.views import *
 
@@ -38,7 +41,11 @@ urlpatterns = [
     url(r'apply/', apply, name='apply'),
     url(r'fixserver/', fix_server, name='fix_server'),
     url(r'pic/', wonder_image, name='wonder_image'),
+<<<<<<< HEAD
     url(r'^department/(.*)', show_department, name='department'),
+=======
+    url(r'department/(.*)', show_department, name='department'),
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     url(r'departmentframework/', show_framework, name='show_framework'),
     url(r'images/', wonder_image),
     url(r'videos/', wonder_image),

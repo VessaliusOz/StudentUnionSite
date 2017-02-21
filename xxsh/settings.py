@@ -39,7 +39,10 @@ INSTALLED_APPS = (
     'frontEndInterface',
     'xadmin',
     'crispy_forms',
+<<<<<<< HEAD
     'reversion',
+=======
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
     'DjangoUeditor',
     'corsheaders',
 )
@@ -115,12 +118,21 @@ STATIC_ROOT = 'static'
 
 STATICFILES_DIRS = (
                     os.path.join(BASE_DIR, 'static/xxsh'),
+<<<<<<< HEAD
+=======
+                    os.path.join(BASE_DIR, 'static/ueditor'),
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
                     os.path.join(BASE_DIR, '/files/'),
 )
 
 CORS_ORIGIN_ALLOW_ALL = True
+<<<<<<< HEAD
 CORS_URLS_REGEX = r'.*'
 CORS_ALLOW_METHODS = ('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH', 'OPTIONS')
+=======
+CORS_URLS_REGEX=r'.*'
+CORS_ALLOW_METHODS=('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH', 'OPTIONS')
+>>>>>>> 3dc4297839b44e88a8444b4d06e10c01e6700bda
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
 MEDIA_URL = '/files/'
