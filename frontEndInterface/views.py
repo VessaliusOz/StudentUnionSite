@@ -23,7 +23,7 @@ def index(request):
             ele_dict = {}
 
             ele_dict['url'] = None
-            ele_dict['image'] = static_url_handle(carousel.image.url)
+            ele_dict['image'] = carousel.image.url
             ret_carousel_list.append(ele_dict)
         ret_dict['carousel'] = ret_carousel_list
 
@@ -97,7 +97,7 @@ def index(request):
         for xact in X_activity.objects.all().order_by('datetime')[0:4]:
             ele_dict = {}
             ele_dict['title'] = xact.name
-            ele_dict['url'] = static_url_handle(xact.image.url)
+            ele_dict['url'] = xact.image.url
 
             ret_xact_list.append(ele_dict)
         ret_dict['xActivity'] = ret_xact_list
@@ -139,7 +139,7 @@ def index(request):
         for star in Star.objects.all():
             ele_dict = {}
             ele_dict['title'] = star.content
-            ele_dict['imageUrl'] = static_url_handle(star.image.url)
+            ele_dict['imageUrl'] = star.image.url
 
             ret_star_list.append(ele_dict)
 
@@ -148,14 +148,14 @@ def index(request):
         # 精彩视频
         ret_video_list = []
         ele_dict = {}
-        ele_dict['imageUrl'] = static_url_handle(WondVideo.objects.all()[0].compress_image.url)
+        ele_dict['imageUrl'] = WondVideo.objects.all()[0].compress_image.url
         ret_video_list.append(ele_dict)
         ret_dict['wonderfulVideo'] = ret_video_list
 
         # 精彩图片
         ret_image_list = []
         ele_dict = {}
-        ele_dict['imageUrl'] = static_url_handle(WondPicture.objects.all()[0].image.url)
+        ele_dict['imageUrl'] = WondPicture.objects.all()[0].image.url
         ret_image_list.append(ele_dict)
         ret_dict['wonderfulImage'] = ret_image_list
 
@@ -189,7 +189,7 @@ def snews(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
-            ret_dict['image'] = static_url_handle(new.image.url)
+            ret_dict['image'] = new.image.url
             if not new.video:
                 ret_dict['video'] = new.video
 
@@ -225,7 +225,7 @@ def xnews(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
-            ret_dict['image'] = static_url_handle(new.image.url)
+            ret_dict['image'] = new.image.url
             if not new.video:
                 ret_dict['video'] = new.video
 
@@ -337,12 +337,12 @@ def wonder_image(request):
         for img in WondPicture.objects.all().order_by('upload_time'):
             ele_dict = {}
             ele_dict['title'] = img.title
-            ele_dict['imageUrl'] = static_url_handle(img.image.url)
+            ele_dict['imageUrl'] = img.image.url
             ret_list.append(ele_dict)
         for video in WondVideo.objects.all().order_by('upload_time'):
             video_dict = {}
             video_dict['title'] = video.title
-            video_dict['compress_image'] = static_url_handle(video.compress_image.url)
+            video_dict['compress_image'] = video.compress_image.url
             video_dict['videoUrl'] = video.video_url
             video_list.append(video_dict)
         json_data = json.dumps({'image': ret_list, 'video': video_list}, ensure_ascii=False, sort_keys=True, indent=4)
@@ -361,7 +361,7 @@ def show_department(request, dynamic_dap_url=None):
                 dep_dict['name'] = department.name
                 dep_dict['introduction'] = department.introduction
                 ret_list.append(dep_dict)
-            organization_framework_image = static_url_handle(SomeElse.objects.all()[0].organization_framework_image.url)
+            organization_framework_image = SomeElse.objects.all()[0].organization_framework_image.url
             organization_framework_text = SomeElse.objects.all()[0].organization_framework_text
             json_data = json.dumps({'department': ret_list, "framework_image": organization_framework_image,
                                     "framework_text": organization_framework_text
@@ -382,7 +382,7 @@ def show_department(request, dynamic_dap_url=None):
                     sta_dict['introduction'] = staff.introduction
                     sta_dict['department'] = staff.department.name
                     sta_dict['chef_flag'] = staff.chef_flag
-                    sta_dict['imageUrl'] = static_url_handle(staff.image.url)
+                    sta_dict['imageUrl'] = staff.image.url
                     staff_list.append(sta_dict)
                 news = department.x_news_set.all()
                 news_list = []
@@ -413,7 +413,7 @@ def show_department(request, dynamic_dap_url=None):
                 staff_dict['introduction'] = staff.introduction
                 staff_dict['department'] = staff.department.name
                 staff_dict['chef_flag'] = staff.chef_flag
-                staff_dict['imageUrl'] = static_url_handle(staff.image.url)
+                staff_dict['imageUrl'] = staff.image.url
                 json_data = json.dumps(staff_dict,
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
@@ -428,7 +428,7 @@ def show_department(request, dynamic_dap_url=None):
                 chef_dict['introduction'] = chef.introduction
                 chef_dict['department'] = chef.department.name
                 chef_dict['chef_now'] = chef.chef_now
-                chef_dict['imageUrl'] = static_url_handle(chef.image.url)
+                chef_dict['imageUrl'] = chef.image.url
                 json_data = json.dumps(chef_dict,
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
@@ -457,7 +457,7 @@ def show_department(request, dynamic_dap_url=None):
 
 
 def show_framework(request):
-    organization_framework_image = static_url_handle(SomeElse.objects.all()[0].organization_framework_image.url)
+    organization_framework_image = SomeElse.objects.all()[0].organization_framework_image.url
     organization_framework_text = SomeElse.objects.all()[0].organization_framework_text
     json_data = json.dumps({"framework_image": organization_framework_image,
                             "framework_text": organization_framework_text
@@ -604,7 +604,7 @@ def show_stars(request, dynamic_url=None):
                 #     new_flag = True
                 # ele_dict['newFlag'] = new_flag
                 ele_dict['content'] = new.content
-                ele_dict['url'] = static_url_handle(new.image.url)
+                ele_dict['url'] = new.image.url
                 ele_dict['text'] = new.text
                 ret_list.append(ele_dict)
             json_data = json.dumps({'star': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
@@ -615,7 +615,7 @@ def show_stars(request, dynamic_url=None):
             ret_dict = {}
             star = Star.objects.get(content=dynamic_url)
             ret_dict['content'] = star.content
-            ret_dict['image'] = static_url_handle(star.image.url)
+            ret_dict['image'] = star.image.url
             ret_dict['text'] = star.text
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse(ret_dict)
@@ -635,7 +635,7 @@ def show_schools(request, dynamic_url=None):
                 ele_dict['chef'] = school.chef
                 ele_dict['chef_introduction'] = school.chef_introduction
                 ret_list.append(ele_dict)
-            system_brief_image = static_url_handle(SomeElse.objects.all()[0].school_system_brief_image.url)
+            system_brief_image = SomeElse.objects.all()[0].school_system_brief_image.url
             system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
             json_data = json.dumps({'schools': ret_list, 'system_brief_image': system_brief_image,
                                     'system_brief_text':system_brief_text}, ensure_ascii=False, sort_keys=True, indent=4)
@@ -653,7 +653,7 @@ def show_schools(request, dynamic_url=None):
                 json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_file, content_type="application/json")
             else:
-                system_brief_image = static_url_handle(SomeElse.objects.all()[0].school_system_brief_image.url)
+                system_brief_image = SomeElse.objects.all()[0].school_system_brief_image.url
                 system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
                 json_data = json.dumps({'system_brief_image': system_brief_image, 'system_brief_text':system_brief_text}
                                        , ensure_ascii=False, sort_keys=True, indent=4)
@@ -669,7 +669,7 @@ def show_course(request):
         for course in all_course:
             course_dict={}
             course_dict['name'] = course.course_name
-            course_dict['fileUrl'] = [{'filename': file.file_name, 'url': static_url_handle(file.file.url)}
+            course_dict['fileUrl'] = [{'filename': file.file_name, 'url': file.file.url}
                                       for file in course.coursefile_set.all()]
             course_list.append(course_dict)
         json_data = json.dumps({'course': course_list}, ensure_ascii=False, sort_keys=True, indent=4)
