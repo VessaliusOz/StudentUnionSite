@@ -39,11 +39,13 @@ INSTALLED_APPS = (
     'frontEndInterface',
     'xadmin',
     'crispy_forms',
-    'reversion',
+    'DjangoUeditor',
+    'corsheaders',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -58,7 +60,7 @@ ROOT_URLCONF = 'xxsh.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': os.path.join(BASE_DIR, 'templates'),
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,8 +108,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/'  # xxsh/
 
 STATIC_ROOT = 'static'
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/xxsh'),)
+STATICFILES_DIRS = (
+                    os.path.join(BASE_DIR, 'static/xxsh'),
+                    os.path.join(BASE_DIR, 'static/ueditor'),
+                    os.path.join(BASE_DIR, '/files/'),
+)
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX=r'.*'
+CORS_ALLOW_METHODS=('GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH', 'OPTIONS')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
+MEDIA_URL = '/files/'
