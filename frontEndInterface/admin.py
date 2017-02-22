@@ -1,6 +1,6 @@
 # encoding:utf8
 import xadmin
-from xadmin.views import CommAdminView
+from xadmin.views import CommAdminView, ModelAdminView
 from frontEndInterface.models import *
 
 
@@ -8,9 +8,15 @@ class GlobalSetting(object):
     site_title = '校学生会管理系统'
     site_footer = 'IEC'
 
+
+
+class DepartmentModelAdmin(ModelAdminView):
+    model = Staff
+    pass
+
 xadmin.site.register(CommAdminView, GlobalSetting)
 
-xadmin.site.register(Department)
+xadmin.site.register(Department, DepartmentModelAdmin)
 xadmin.site.register(Staff)
 xadmin.site.register(X_news)
 xadmin.site.register(X_activity)
@@ -26,8 +32,15 @@ xadmin.site.register(WondPicture)
 xadmin.site.register(Academy)
 xadmin.site.register(Rights)
 xadmin.site.register(Thoughts)
+
+xadmin.site.register(BusinessCooperation)
+xadmin.site.register(ForeignContact)
+
+
 xadmin.site.register(Course)
 xadmin.site.register(CourseFile)
+xadmin.site.register(CourseInformation)
+
 xadmin.site.register(Apply)
 xadmin.site.register(Safeguard)
 xadmin.site.register(FixServer)

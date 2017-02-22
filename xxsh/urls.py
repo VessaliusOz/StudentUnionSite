@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^xnews/(.*)', xnews, name='xnews'),
     url(r'^snews/(.*)', snews, name='snews'),
     url(r'^information/(.*)', show_information, name='show_information'),
+    url(r'^business/(.*)', show_business, name='snews'),
+    url(r'^contact/(.*)', show_contact, name='snews'),
     url(r'^safegaurd/', safegaurd, name='safegaurd'),
     url(r'^apply/', apply, name='apply'),
     url(r'^fixserver/', fix_server, name='fix_server'),
@@ -44,6 +46,7 @@ urlpatterns = [
     url(r'^thoughts/(.*)', show_thoughts),
     url(r'^stars/(.*)', show_stars),
     url(r'^schools/(.*)', show_schools),
-    url(r'^course/', show_course),
+    url(r'^course/(.*)', show_course),
+    url(r'^courseinformation/(.*)', show_course_information)
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
