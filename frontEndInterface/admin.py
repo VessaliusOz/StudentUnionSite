@@ -13,6 +13,7 @@
 """
 
 import xadmin
+from xadmin.views import CommAdminView, ModelAdminView
 from models import *
 
 
@@ -32,6 +33,11 @@ class BaseCustomAdmin(object):
             'js/editor/kindeditor/config.js',
         ))
         return media
+
+
+class GlobalSetting(object):
+    site_title = '校学生会管理系统'
+    site_footer = 'IEC'
 
 
 class WpPostsAdmin(BaseCustomAdmin):
@@ -125,6 +131,23 @@ class CourseFileAdmin(BaseCustomAdmin):
 class TestImageAdmin(BaseCustomAdmin):
     pass
 
+
+class BusinessCooperationAdmin(BaseCustomAdmin):
+    pass
+
+
+class ForeignContactAdmin(BaseCustomAdmin):
+    pass
+
+
+class CourseInformationAdmin(BaseCustomAdmin):
+    pass
+
+
+class DepartmentModelAdmin(ModelAdminView):
+    model = Staff
+    pass
+
 xadmin.site.register(WpPosts, WpPostsAdmin)
 xadmin.site.register(Department, DepartmentAdmin)
 xadmin.site.register(Staff, StaffAdmin)
@@ -148,3 +171,7 @@ xadmin.site.register(Chef, ChefAdmin)
 xadmin.site.register(Course, CourseAdmin)
 xadmin.site.register(CourseFile, CourseFileAdmin)
 xadmin.site.register(TestImage, TestImageAdmin)
+xadmin.site.register(BusinessCooperation, BusinessCooperationAdmin)
+xadmin.site.register(ForeignContact, ForeignContactAdmin)
+xadmin.site.register(CourseInformation, CourseInformationAdmin)
+xadmin.site.register(CommAdminView, GlobalSetting)
