@@ -1,16 +1,11 @@
-# coding=utf-8生气生
-
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.http import HttpResponse
-from frontEndInterface.models import *
-from django.utils import timezone
-from frontEndInterface.tools import static_url_handle
+# coding=utf-8
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from models import *
 import json
-
-
-# Create your views here.
 
 
 def index(request):
@@ -178,9 +173,9 @@ def snews(request, dynamic_news_url=None):
                 ele_dict['viewNum'] = new.view_num
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
                 ret_list.append(ele_dict)
-            # json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
-            return JsonResponse({'news': ret_list})
-            # return HttpResponse(json_data, content_type="application/json")
+            json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse({'news': ret_list})
+            return HttpResponse(json_data, content_type="application/json")
 
         else:
             new = S_news.objects.get(title=dynamic_news_url)
@@ -189,8 +184,10 @@ def snews(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
+
             if new.image.url:
                 ret_dict['image'] = new.image.url
+
             if not new.video:
                 ret_dict['video'] = new.video
 
@@ -198,7 +195,7 @@ def snews(request, dynamic_news_url=None):
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
-            if new.file.url:
+            if new.file:
                 ret_dict['attachmentUrl'] = new.file.url
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse(ret_dict)
@@ -218,8 +215,9 @@ def xnews(request, dynamic_news_url=None):
                 ele_dict['viewNum'] = new.view_num
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
                 ret_list.append(ele_dict)
-
-            return JsonResponse({'news': ret_list})
+            json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse({'news': ret_list})
+            return HttpResponse(json_data, content_type="application/json")
 
         else:
             new = X_news.objects.get(title=dynamic_news_url)
@@ -228,8 +226,10 @@ def xnews(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
+
             if new.image.url:
                 ret_dict['image'] = new.image.url
+
             if not new.video:
                 ret_dict['video'] = new.video
 
@@ -237,10 +237,11 @@ def xnews(request, dynamic_news_url=None):
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
-            if new.file.url:
+            if new.file:
                 ret_dict['attachmentUrl'] = new.file.url
-            return JsonResponse(ret_dict)
-            # return HttpResponse(json_file, content_type="application/json")
+            json_data = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse(ret_dict)
+            return HttpResponse(json_data, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
 
@@ -255,9 +256,9 @@ def show_information(request, dynamic_news_url=None):
                 ele_dict['title'] = notice.title
                 ele_dict['datetime'] = notice.datetime.strftime(("%Y-%m-%d %H:%M"))
                 ret_list.append(ele_dict)
-            # json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
-            return JsonResponse({'information': ret_list})
-            # return HttpResponse(json_data, content_type="application/json")
+            json_data = json.dumps({'information': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse({'information': ret_list})
+            return HttpResponse(json_data, content_type="application/json")
 
         else:
             notice = Information.objects.get(title=dynamic_news_url)
@@ -272,7 +273,7 @@ def show_information(request, dynamic_news_url=None):
             ret_dict['excEditor'] = notice.exc_editor
             ret_dict['dutyEditor'] = notice.duty_editor
             ret_dict['viewNum'] = notice.view_num
-            if notice.file.url:
+            if notice.file:
                 ret_dict['attachmentUrl'] = notice.file.url
             ret_dict['datetime'] = notice.datetime.strftime(("%Y-%m-%d %H:%M"))
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
@@ -310,7 +311,7 @@ def show_business(request, dynamic_news_url=None):
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
-            if new.file.url:
+            if new.file:
                 ret_dict['attachmentUrl'] = new.file.url
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse(ret_dict)
@@ -346,7 +347,8 @@ def show_contact(request, dynamic_news_url=None):
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
-            ret_dict['attachmentUrl'] = new.file.url
+            if new.file:
+                ret_dict['attachmentUrl'] = new.file.url
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse(ret_dict)
             return HttpResponse(json_file, content_type="application/json")
@@ -492,8 +494,10 @@ def show_department(request, dynamic_dap_url=None):
                 staff_dict['department'] = staff.department.name
                 staff_dict['chef_flag'] = staff.chef_flag
                 staff_dict['imageUrl'] = staff.image.url
+
                 staff_dict['phone'] = staff.telephone
                 staff_dict['email'] = staff.e_mail
+
                 json_data = json.dumps(staff_dict,
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
@@ -759,6 +763,7 @@ def show_course(request, dynamic_url=None):
         return HttpResponse('fail , method wrong')
 
 
+
 def show_course_information(request, dynamic_news_url=None):
     if request.method == 'GET':
         if not dynamic_news_url:
@@ -787,11 +792,33 @@ def show_course_information(request, dynamic_news_url=None):
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
-            if new.file.url:
+            if new.file:
                 ret_dict['attachmentUrl'] = new.file.url
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse(ret_dict)
             return HttpResponse(json_file, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
+
+
+def upload_media(request):
+    """
+    :param request:
+    :return: {'error': 0, 'url': 'file_url'} or {'error': 1}
+    :description: 接收后台富文本Textarea上传的媒体文件,正常接收&存储返回{'error': 0, 'url': '/file/path/to/upload_media.png'}.
+    :var: media_type: 接收媒体文件类型, image / media / file
+          media_data: 接收媒体文件数据, 可直接写入文件
+    """
+    media_type = request.GET.get('dir')
+    media_data = request.FILES.get('media_file').read()
+    return JsonResponse({'error': 0, 'url': '/files/information/d.jpg'})
+
+
+def get_test_data(request):
+    """
+    :param request:
+    :return:
+    :description: 测试富文本返回页面
+    """
+    return HttpResponse(WpPosts.objects.get(post_title='asd').post_content)
 

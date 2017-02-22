@@ -4,7 +4,6 @@ from django.utils.datetime_safe import datetime
 from DjangoUeditor.models import UEditorField
 
 
-# Create your models here.
 class Department(models.Model):
     name = models.CharField(max_length=20, default='部门的名字', verbose_name='名称',unique=True)
     introduction = models.TextField(default='这是简介', verbose_name='介绍')
@@ -424,3 +423,15 @@ class CourseFile(models.Model):
 
 class TestImage(models.Model):
     Image_x = models.ImageField(upload_to='image', blank=True, null=True)
+
+
+class WpPosts(models.Model):
+    post_title = models.CharField(max_length=100, default='')
+    post_content = models.TextField(max_length=54321)
+
+    class Meta:
+        verbose_name = u'富文本(测试)'
+        verbose_name_plural = u'富文本(测试)'
+
+    def __str__(self):
+        return u'富文本测试: ' + self.post_title
