@@ -1,5 +1,5 @@
 KindEditor.ready(function (K) {
-    window.editor = K.create('textarea[maxlength=54321]', {
+    window.editor = K.create('textarea', {
         width: '550px',
         height: '400px',
         minWidth: 550,

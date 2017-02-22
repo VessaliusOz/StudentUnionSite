@@ -357,7 +357,7 @@ class TestImage(models.Model):
 
 class WpPosts(models.Model):
     post_title = models.CharField(max_length=100, default='')
-    post_content = models.TextField(max_length=54321)
+    post_content = models.TextField()
 
     class Meta:
         verbose_name = u'富文本(测试)'
