@@ -1,9 +1,14 @@
-
+# encoding:utf8
 import xadmin
+from xadmin.views import CommAdminView
 from frontEndInterface.models import *
 
-# Register your models here.
 
+class GlobalSetting(object):
+    site_title = '校学生会管理系统'
+    site_footer = 'IEC'
+
+xadmin.site.register(CommAdminView, GlobalSetting)
 
 xadmin.site.register(Department)
 xadmin.site.register(Staff)
@@ -11,23 +16,27 @@ xadmin.site.register(X_news)
 xadmin.site.register(X_activity)
 xadmin.site.register(Information)
 xadmin.site.register(Carousel)
-xadmin.site.register(Apply)
-xadmin.site.register(Safeguard)
-xadmin.site.register(FixServer)
 xadmin.site.register(School)
 xadmin.site.register(S_news)
-
 xadmin.site.register(SomeElse)
+xadmin.site.register(Chef)
 xadmin.site.register(Star)
 xadmin.site.register(WondVideo)
 xadmin.site.register(WondPicture)
 xadmin.site.register(Academy)
 xadmin.site.register(Rights)
 xadmin.site.register(Thoughts)
-xadmin.site.register(Chef)
 xadmin.site.register(Course)
 xadmin.site.register(CourseFile)
-xadmin.site.register(TestImage)
+xadmin.site.register(Apply)
+xadmin.site.register(Safeguard)
+xadmin.site.register(FixServer)
+
+
+
+
+
+
 
 
 

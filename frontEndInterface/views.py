@@ -505,19 +505,6 @@ def show_academy(request, dynamic_news_url=None):
         return HttpResponse('fail, wrong request method')
 
 
-# title = models.CharField(max_length=100, default="学术那一栏要填充的字符")
-#     url = models.CharField(max_length=200, default="这个学术所指向的url")
-#     text = models.TextField(default="学术那一栏要填充的字符")
-#     datetime = models.DateTimeField(default=datetime.now())
-#
-#     class Meta:
-#         verbose_name = u'学术'
-#         verbose_name_plural = u'学术'
-#
-#     def __unicode__(self):
-#         return self.title
-
-
 def show_rights(request, dynamic_news_url=None):
     if request.method == 'GET':
         if not dynamic_news_url:
