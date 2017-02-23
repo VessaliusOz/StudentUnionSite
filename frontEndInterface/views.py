@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-from models import *
+from .models import *
 import json
 
 
@@ -763,7 +763,6 @@ def show_course(request, dynamic_url=None):
         return HttpResponse('fail , method wrong')
 
 
-
 def show_course_information(request, dynamic_news_url=None):
     if request.method == 'GET':
         if not dynamic_news_url:
@@ -775,9 +774,9 @@ def show_course_information(request, dynamic_news_url=None):
                 ele_dict['viewNum'] = new.view_num
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
                 ret_list.append(ele_dict)
-            # json_data = json.dumps({'news': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
-            return JsonResponse({'contact': ret_list})
-            # return HttpResponse(json_data, content_type="application/json")
+            json_data = json.dumps({'courseinformation': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
+            # return JsonResponse({'contact': ret_list})
+            return HttpResponse(json_data, content_type="application/json")
 
         else:
             new = CourseInformation.objects.get(title=dynamic_news_url)
@@ -799,6 +798,77 @@ def show_course_information(request, dynamic_news_url=None):
             return HttpResponse(json_file, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
+
+
+def show_schoolUnion(request):
+    if request.method == "GET":
+        try:
+            school = models.ForeignKey(SchoolUnion, verbose_name="学生联合会")
+            schoolUnion = SchoolUnion.objects.all()[0]
+            ret_dict = {}
+            ret_dict['text'] = schoolUnion.Text
+            ret_dict['chef'] = "suchef/"
+            ret_dict['staff'] = "sustaff/"
+            ret_dict['photos'] = 'suphoto/'
+        except:
+            ret_dict = {}
+            ret_dict['text'] = ''
+            ret_dict['chef'] = ""
+            ret_dict['staff'] = ""
+            ret_dict['photos'] = ''
+        return JsonResponse(ret_dict)
+    else:
+        return HttpResponse("fail wrong method")
+
+
+def show_suChef(request):
+    if request.method == "GET":
+        # suChef_list = SchoolUnion.suchef_set.all()
+        chef_list = []
+        for suChef in SchoolUnion.suchef_set.all().order_by("datetime"):
+            ret_dict = {}
+            ret_dict['name'] = suChef.name
+            ret_dict['if_chef_now'] = suChef.if_chef_now
+            ret_dict["introduction"] = suChef.introduction
+            ret_dict["grade"] = suChef.grade
+            ret_dict["datetime"] = suChef.datetime.strftime(("%Y-%m-%d %H:%M"))
+            ret_dict["telephone"] = suChef.telephone
+            ret_dict["email"] = suChef.e_mail
+            chef_list.append(ret_dict)
+        return JsonResponse(chef_list)
+    else:
+        return HttpResponse("fail wrong method")
+
+
+def show_suStaff(request):
+    if request.method == "GET":
+        # suChef_list = SchoolUnion.suchef_set.all()
+        chef_list = []
+        for sustaff in SchoolUnion.sustaff_set.all():
+            ret_dict = {}
+            ret_dict['name'] = sustaff.name
+            ret_dict["introduction"] = sustaff.introduction
+            ret_dict["grade"] = sustaff.grade
+            ret_dict["rank"] = sustaff.rank
+            ret_dict["telephone"] = sustaff.telephone
+            ret_dict["email"] = sustaff.e_mail
+            chef_list.append(ret_dict)
+        return JsonResponse(chef_list)
+    else:
+        return HttpResponse("fail wrong method")
+
+
+def show_oldPicture(request):
+    if request.method == "GET":
+         photo = SchoolUnion.suphoto.photo
+         return JsonResponse({"photo": photo.photo})
+    else:
+        return HttpResponse("wrong method")
+
+
+# class suPhoto(models.Model):
+#     shcool = models.ForeignKey(SchoolUnion, verbose_name="学生联合会历史图片")
+#     photo = models.TextField(verbose_name="历史照片")
 
 
 def upload_media(request):

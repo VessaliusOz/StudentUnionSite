@@ -1,13 +1,75 @@
 # coding=utf-8
 from django.db import models
 from django.utils.datetime_safe import datetime
-from DjangoUeditor.models import UEditorField
+
+
+class SchoolUnion(models.Model):
+    Text = models.TextField(default='学联简介，组织架构，历史', verbose_name='学生联合会')
+
+    class Meta:
+        verbose_name = '学生联合会'
+        verbose_name_plural = '学生联合会'
+
+    def __unicode__(self):
+        return "学生联合会"
+
+
+class suChef(models.Model):
+    name = models.CharField(max_length=20, default='主席', verbose_name='主席')
+    if_chef_now = models.BooleanField(default=False, verbose_name='是否在任')
+    introduction = models.TextField(default='introduction', verbose_name='介绍')
+    # image = models.ImageField(upload_to='chef', default=None, null=True, verbose_name='图片')
+    grade = models.CharField(max_length=20, default='', verbose_name='年级')
+    datetime = models.DateTimeField(default=datetime.now(), verbose_name='上任时间(排序用)')
+    telephone = models.CharField(max_length=30, default='电话号码', verbose_name='电话号码', blank=True)
+    e_mail = models.CharField(max_length=30, default='Email', verbose_name='Email', blank=True)
+    school = models.ForeignKey(SchoolUnion, verbose_name="学生联合会")
+
+    class Meta:
+        verbose_name_plural = '主席'
+        verbose_name = '主席'
+
+    def __unicode__(self):
+        return self.name
+
+
+class suStaff(models.Model):
+    name = models.CharField(max_length=20, default='骨干', verbose_name='姓名', unique=True)
+    grade = models.CharField(max_length=20, default='', verbose_name='年级')  # 大几
+    rank = models.CharField(max_length=20, default='', verbose_name='职务')
+    introduction = models.TextField(verbose_name='介绍', default='introduction')
+    telephone = models.CharField(max_length=30, default='电话号码', verbose_name='电话号码')
+    e_mail = models.CharField(max_length=30, default='Email', verbose_name='Email')
+    school = models.ForeignKey(SchoolUnion, verbose_name="学生联合会")
+
+    class Meta:
+        verbose_name = '骨干'
+        verbose_name_plural = '骨干'
+
+    def __unicode__(self):
+        return self.name
+
+
+# class suPhoto(models.Model):
+#     shcool = models.ForeignKey(SchoolUnion, verbose_name="学生联合会历史图片")
+#     photo = models.TextField(verbose_name="历史照片")
+#
+class suPhoto(models.Model):
+    school = models.OneToOneField(SchoolUnion, verbose_name="学生联合会")
+    photo = models.TextField(verbose_name="历史照片")
+
+    class Meta:
+        verbose_name = "历史照片"
+        verbose_name_plural = "历史照片"
+
+    def __unicode__(self):
+        return "历史照片"
 
 
 class Department(models.Model):
     name = models.CharField(max_length=20, default='部门的名字', verbose_name='名称',unique=True)
     introduction = models.TextField(default='这是简介', verbose_name='介绍')
-    image = models.ImageField(upload_to='department', default=None, null=True, verbose_name='图片')
+    image = models.ImageField(upload_to='department', default=None, null=True, verbose_name='视频缩略图')
     video_url = models.CharField(max_length=200, default='视频链接', blank=True, verbose_name='视频链接')
 
     class Meta:
@@ -23,7 +85,7 @@ class Staff(models.Model):
     grade = models.CharField(max_length=20, default='', verbose_name='年级')  # 大几
     rank = models.CharField(max_length=20, default='', verbose_name='职务')
     introduction = models.TextField(verbose_name='介绍')
-    image = models.ImageField(upload_to='staff', verbose_name='图片')
+    #  image = models.ImageField(upload_to='staff', verbose_name='图片')
     department = models.ForeignKey(Department, verbose_name='部门')
     chef_flag = models.BooleanField(default=False, verbose_name='是否为骨干')  # 是否是骨干
     telephone = models.CharField(max_length=30, default='电话号码', verbose_name='电话号码')
@@ -42,7 +104,7 @@ class Chef(models.Model):
     name = models.CharField(max_length=20, default='部长的名字', verbose_name='部长')
     if_chef_now = models.BooleanField(default=False, verbose_name='是否在任')
     introduction = models.TextField(default='introduction', verbose_name='介绍')
-    image = models.ImageField(upload_to='chef', default=None, null=True, verbose_name='图片')
+    # image = models.ImageField(upload_to='chef', default=None, null=True, verbose_name='图片')
     grade = models.CharField(max_length=20, default='', verbose_name='年级')
     department = models.ForeignKey(Department, verbose_name='部门')
     datetime = models.DateTimeField(default=datetime.now(), verbose_name='上任时间(排序用)')
@@ -61,7 +123,7 @@ class X_news(models.Model):
     '''校学生会的新闻'''
     title = models.CharField(max_length=100, verbose_name='标题', default='标题', unique=True)
     body = models.TextField(verbose_name='内容')
-    image = models.ImageField(upload_to='xnews', verbose_name='图片')
+    image = models.ImageField(upload_to='xnews', verbose_name='视频缩略图')
     video = models.CharField(max_length=200, blank=True, verbose_name='视频链接')
     exc_editor = models.CharField(max_length=20, default='本新闻执行编辑', verbose_name='执行编辑')
     duty_editor = models.CharField(max_length=20, default='本新闻责任编辑', verbose_name='责任编辑')
@@ -81,7 +143,7 @@ class X_news(models.Model):
 class X_activity(models.Model):
     name = models.CharField(max_length=100, verbose_name='活动', unique=True)
     body = models.TextField(verbose_name='内容')
-    image = models.ImageField(upload_to='activity', verbose_name='图片')
+    image = models.ImageField(upload_to='activity', verbose_name='视频缩略图')
     video = models.CharField(max_length=200, blank=True, verbose_name='视频链接',default='视频链接')
     sponsor = models.CharField(max_length=20, verbose_name='赞助商')
     datetime = models.DateTimeField(default=datetime.now(),verbose_name='创建时间')
@@ -118,7 +180,7 @@ class School(models.Model):
 class S_news(models.Model):  # 院会的新闻
     title = models.CharField(max_length=100, verbose_name='标题', default='标题', unique=True)
     body = models.TextField(verbose_name='内容')
-    image = models.ImageField(upload_to='snews', verbose_name='图片')
+    image = models.ImageField(upload_to='snews', verbose_name='视频缩略图')
     video = models.CharField(max_length=200, blank=True, verbose_name='视频链接')
     exc_editor = models.CharField(max_length=20, default='本新闻执行编辑', verbose_name='执行编辑')
     duty_editor = models.CharField(max_length=20, default='本新闻责任编辑', verbose_name='责任编辑')
@@ -143,7 +205,7 @@ class Information(models.Model):
     datetime = models.DateTimeField(default=datetime.now(), verbose_name='时间')
     view_num = models.IntegerField(default=0, verbose_name='浏览数')
     title = models.CharField(max_length=100, verbose_name='标题', default='标题', unique=True)
-    image = models.ImageField(upload_to='information', default=None, blank=True, null=True, verbose_name='图片')
+    image = models.ImageField(upload_to='information', default=None, blank=True, null=True, verbose_name='视频缩略图')
     body = models.TextField(verbose_name='内容')
     exc_editor = models.CharField(max_length=20, default='本公告执行编辑', verbose_name='执行编辑')
     duty_editor = models.CharField(max_length=20, default='本公告责任编辑', verbose_name='责任编辑')
@@ -162,7 +224,7 @@ class BusinessCooperation(models.Model):
     datetime = models.DateTimeField(default=datetime.now(), verbose_name='时间')
     view_num = models.IntegerField(default=0, verbose_name='浏览数')
     title = models.CharField(max_length=100, verbose_name='标题', default='标题', unique=True)
-    image = models.ImageField(upload_to='Business', default=None, blank=True, null=True, verbose_name='图片')
+    image = models.ImageField(upload_to='Business', default=None, blank=True, null=True, verbose_name='视频缩略图')
     body = models.TextField(verbose_name='内容')
     exc_editor = models.CharField(max_length=20, default='本公告执行编辑', verbose_name='执行编辑')
     duty_editor = models.CharField(max_length=20, default='本公告责任编辑', verbose_name='责任编辑')
@@ -181,7 +243,7 @@ class ForeignContact(models.Model):
     datetime = models.DateTimeField(default=datetime.now(), verbose_name='时间')
     view_num = models.IntegerField(default=0, verbose_name='浏览数')
     title = models.CharField(max_length=100, verbose_name='标题', default='标题', unique=True)
-    image = models.ImageField(upload_to='ForeignContact', default=None, blank=True, null=True, verbose_name='图片')
+    image = models.ImageField(upload_to='ForeignContact', default=None, blank=True, null=True, verbose_name='视频缩略图')
     body = models.TextField(verbose_name='内容')
     exc_editor = models.CharField(max_length=20, default='本公告执行编辑', verbose_name='执行编辑')
     duty_editor = models.CharField(max_length=20, default='本公告责任编辑', verbose_name='责任编辑')
@@ -276,12 +338,12 @@ class Safeguard(models.Model):
 class SomeElse(models.Model):
     group_frame = models.ImageField()
     school_system_brief_image = models.ImageField(upload_to='school_system',
-                                                  default=None, null=True, blank=True, verbose_name='院会体系图片')
+                                                  default=None, null=True, blank=True, verbose_name='院会体系视频缩略图')
     school_system_brief_text = models.TextField(default=None, null=True, blank=True, verbose_name='院会体系内容')
     school_system_brief_video = models.CharField(max_length=200, default='视频连接', blank=True, verbose_name='院会体系视频')
     organization_framework_text = models.TextField(default=None, null=True, blank=True, verbose_name='组织架构内容')
     organization_framework_image = models.ImageField(upload_to='organizatin_framework',
-                                                  default=None, null=True, blank=True, verbose_name='组织架构图片')
+                                                  default=None, null=True, blank=True, verbose_name='组织架构视频缩略图')
     organization_framework_video = models.CharField(max_length=200, default='视频连接', blank=True, verbose_name='组织架构视频')
 
     class Meta:
@@ -394,7 +456,7 @@ class CourseInformation(models.Model):
     datetime = models.DateTimeField(default=datetime.now(), verbose_name='时间')
     view_num = models.IntegerField(default=0, verbose_name='浏览数')
     title = models.CharField(max_length=100, verbose_name='标题', default='标题', unique=True)
-    image = models.ImageField(upload_to='CourseInformation', blank=True, default=None, null=True, verbose_name='图片')
+    image = models.ImageField(upload_to='CourseInformation', blank=True, default=None, null=True, verbose_name='视频缩略图')
     body = models.TextField(verbose_name='内容')
     exc_editor = models.CharField(max_length=20, default='本公告执行编辑', verbose_name='执行编辑')
     duty_editor = models.CharField(max_length=20, default='本公告责任编辑', verbose_name='责任编辑')
@@ -419,6 +481,8 @@ class CourseFile(models.Model):
 
     def __unicode__(self):
         return self.file_name
+
+
 
 
 class TestImage(models.Model):

@@ -1,8 +1,7 @@
-
 # encoding:utf8
 import xadmin
 from xadmin.views import CommAdminView, ModelAdminView
-from models import *
+from .models import *
 
 
 class GlobalSetting(object):
@@ -28,6 +27,7 @@ class DepartmentModelAdmin(ModelAdminView):
 
 xadmin.site.register(CommAdminView, GlobalSetting)
 xadmin.site.register(WpPosts, EditorXAdmin)
+xadmin.site.register(SchoolUnion)
 xadmin.site.register(Department)
 xadmin.site.register(Staff)
 xadmin.site.register(X_news)
