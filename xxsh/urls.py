@@ -13,18 +13,20 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url, handler404, handler500
-from django.conf.urls.static import static
+from django.conf.urls import include, url
 from django.conf import settings
 from frontEndInterface.views import *
 import xadmin
 xadmin.autodiscover()
 
+handler404 = http_exception_handler
+handler500 = http_exception_handler
+
 urlpatterns = [
-    url(r'xadmin/', include(xadmin.site.urls)),
-    url(r'index/$', index, name='index'),
-    url(r'xnews/(.*)', xnews, name='xnews'),
-    url(r'snews/(.*)', snews, name='snews'),
+    url(r'^xadmin/', include(xadmin.site.urls)),
+    url(r'^index/$', index, name='index'),
+    url(r'^xnews/(.*)', xnews, name='xnews'),
+    url(r'^snews/(.*)', snews, name='snews'),
     url(r'^information/(.*)', show_information, name='show_information'),
     url(r'^business/(.*)', show_business, name='snews'),
     url(r'^contact/(.*)', show_contact, name='snews'),
@@ -48,5 +50,8 @@ urlpatterns = [
     url(r'^schoolunion/$', show_schoolUnion),
     url(r'^suphoto/$', show_oldPicture),
     url(r'^suchef/$', show_suChef),
-    url(r'^sustaff/$', show_suStaff)
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    url(r'^sustaff/$', show_suStaff),
+    url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+    url(r'^files/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT})
+]
+

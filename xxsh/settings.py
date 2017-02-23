@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -23,9 +22,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '&)fhkg0^d3nak-+#&%*0f$iskjnw5_a+*h9m=qle1cn$8u#9(f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -46,7 +45,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -109,13 +108,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'  # xxsh/
 
-# STATIC_ROOT = 'static'
+STATIC_ROOT = 'static'
 
-STATICFILES_DIRS = (
-                    os.path.join(BASE_DIR, 'static/xxsh'),
-                    os.path.join(BASE_DIR, '/files/'),
-                    os.path.join(BASE_DIR, 'static')
-)
+# STATICFILES_DIRS = (
+#     os.path.join(BASE_DIR, '/files/'),
+# )
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'.*'
