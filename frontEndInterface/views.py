@@ -1,10 +1,12 @@
 # coding=utf-8
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from models import *
+
+import tools
 import json
 
 
@@ -806,12 +808,16 @@ def upload_media(request):
     :param request:
     :return: {'error': 0, 'url': 'file_url'} or {'error': 1}
     :description: 接收后台富文本Textarea上传的媒体文件,正常接收&存储返回{'error': 0, 'url': '/file/path/to/upload_media.png'}.
-    :var: media_type: 接收媒体文件类型, image / media / file
+    :var: media_type: 接收媒体文件类型, image / file, 不支持上传音视频文件(media)
           media_data: 接收媒体文件数据, 可直接写入文件
+          media_suffix: 接收媒体文件后缀名
     """
-    media_type = request.GET.get('dir')
-    media_data = request.FILES.get('media_file').read()
-    return JsonResponse({'error': 0, 'url': '/files/information/d.jpg'})
+
+    type = request.GET.get('dir')
+    media = request.FILES.get('media_file')
+    manager = tools.UploadMediaManager()
+    media_url = manager.save(media, type)
+    return JsonResponse({'error': 0, 'url': media_url})
 
 
 def get_test_data(request):
@@ -822,3 +828,6 @@ def get_test_data(request):
     """
     return HttpResponse(WpPosts.objects.get(post_title='asd').post_content)
 
+
+def http_exception_handler(request):
+    return HttpResponse()

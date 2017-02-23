@@ -420,13 +420,9 @@ class CourseFile(models.Model):
         return self.file_name
 
 
-class TestImage(models.Model):
-    Image_x = models.ImageField(upload_to='image', blank=True, null=True)
-
-
 class WpPosts(models.Model):
     post_title = models.CharField(max_length=100, default='')
-    post_content = models.TextField()
+    post_content = models.TextField(blank=True)
 
     class Meta:
         verbose_name = u'富文本(测试)'

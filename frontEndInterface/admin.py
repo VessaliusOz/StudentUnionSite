@@ -28,9 +28,9 @@ class BaseCustomAdmin(object):
         """
         media = super(BaseCustomAdmin, self).get_media()
         media.add_js((
-            'js/editor/kindeditor/kindeditor-all-min.js',
-            'js/editor/kindeditor/lang/zh_CN.js',
-            'js/editor/kindeditor/config.js',
+            'js/editor/kindeditor-4.1.12/kindeditor-all.js',
+            'js/editor/kindeditor-4.1.12/lang/zh-CN.js',
+            'js/editor/kindeditor-4.1.12/config.js',
         ))
         return media
 
@@ -128,10 +128,6 @@ class CourseFileAdmin(BaseCustomAdmin):
     pass
 
 
-class TestImageAdmin(BaseCustomAdmin):
-    pass
-
-
 class BusinessCooperationAdmin(BaseCustomAdmin):
     pass
 
@@ -170,7 +166,6 @@ xadmin.site.register(Thoughts, ThoughtsAdmin)
 xadmin.site.register(Chef, ChefAdmin)
 xadmin.site.register(Course, CourseAdmin)
 xadmin.site.register(CourseFile, CourseFileAdmin)
-xadmin.site.register(TestImage, TestImageAdmin)
 xadmin.site.register(BusinessCooperation, BusinessCooperationAdmin)
 xadmin.site.register(ForeignContact, ForeignContactAdmin)
 xadmin.site.register(CourseInformation, CourseInformationAdmin)
