@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-from models import *
+from .models import *
 
 import tools
 import json
@@ -26,7 +26,7 @@ def index(request):
 
         # 校会新闻
         ret_xnews_list = []
-        for xnew in X_news.objects.all().order_by('datetime')[0:8]:
+        for xnew in X_news.objects.all().order_by('-datetime')[0:8]:
             ele_dict = {}
 
             # 决定是不是有new这个小标签
@@ -50,7 +50,7 @@ def index(request):
 
         # 院会新闻
         ret_snews_list = []
-        for snew in S_news.objects.all().order_by('datetime')[0:8]:
+        for snew in S_news.objects.all().order_by('-datetime')[0:8]:
             ele_dict = {}
 
             # 决定是不是有new这个小标签
@@ -72,7 +72,7 @@ def index(request):
 
         # 信息公告
         ret_info_list = []
-        for info in Information.objects.all().order_by('datetime')[0:6]:
+        for info in Information.objects.all().order_by('-datetime')[0:6]:
             ele_dict = {}
             deltatime = datetime.now() - info.datetime.replace(tzinfo=None)
             if deltatime.days >= 7:
@@ -91,17 +91,19 @@ def index(request):
 
         # 学联活动推荐
         ret_xact_list = []
-        for xact in X_activity.objects.all().order_by('datetime')[0:4]:
+        for xact in X_activity.objects.all().order_by('-datetime')[0:4]:
             ele_dict = {}
             ele_dict['title'] = xact.name
-            ele_dict['url'] = xact.image.url
+            if xact.image:
+                ele_dict['url'] = xact.image.url
+                ele_dict['video'] = xact.video
 
             ret_xact_list.append(ele_dict)
         ret_dict['xActivity'] = ret_xact_list
 
         # 学术
         ret_academy_list = []
-        for aca in Academy.objects.all():
+        for aca in Academy.objects.all().order_by("-datetime"):
             ele_dict = {}
             ele_dict['title'] = aca.title
             ele_dict['url'] = aca.url
@@ -136,7 +138,8 @@ def index(request):
         for star in Star.objects.all():
             ele_dict = {}
             ele_dict['title'] = star.content
-            ele_dict['imageUrl'] = star.image.url
+            if star.image:
+                ele_dict['imageUrl'] = star.image.url
 
             ret_star_list.append(ele_dict)
 
@@ -144,20 +147,26 @@ def index(request):
 
         # 精彩视频
         ret_video_list = []
-        ele_dict = {}
-        ele_dict['imageUrl'] = WondVideo.objects.all()[0].compress_image.url
-        ret_video_list.append(ele_dict)
+
+        for video in WondVideo.objects.all().order_by("-upload_time"):
+            ele_dict = {}
+            ele_dict['imageUrl'] = video.compress_image.url
+            ele_dict['video'] = video.video_url
+            ret_video_list.append(ele_dict)
+            break
         ret_dict['wonderfulVideo'] = ret_video_list
 
         # 精彩图片
         ret_image_list = []
-        ele_dict = {}
-        ele_dict['imageUrl'] = WondPicture.objects.all()[0].image.url
-        ret_image_list.append(ele_dict)
+
+        for image in WondPicture.objects.all().order_by("-upload_time"):
+            ele_dict = {}
+            ele_dict['imageUrl'] = image.image.url
+            ret_image_list.append(ele_dict)
+            break
         ret_dict['wonderfulImage'] = ret_image_list
 
         json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
-        # return JsonResponse(ret_dict)
         return HttpResponse(json_file, content_type="application/json")
 
     else:
@@ -169,7 +178,7 @@ def snews(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in S_news.objects.all().order_by('datetime'):
+            for new in S_news.objects.all().order_by('-datetime'):
                 ele_dict = {}
                 ele_dict['title'] = new.title
                 ele_dict['viewNum'] = new.view_num
@@ -187,10 +196,10 @@ def snews(request, dynamic_news_url=None):
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
 
-            if new.image.url:
+            if new.image:
                 ret_dict['image'] = new.image.url
 
-            if not new.video:
+            if new.video:
                 ret_dict['video'] = new.video
 
             ret_dict['excEditor'] = new.exc_editor
@@ -211,7 +220,7 @@ def xnews(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in X_news.objects.all().order_by('datetime'):
+            for new in X_news.objects.all().order_by('-datetime'):
                 ele_dict = {}
                 ele_dict['title'] = new.title
                 ele_dict['viewNum'] = new.view_num
@@ -229,10 +238,10 @@ def xnews(request, dynamic_news_url=None):
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
 
-            if new.image.url:
+            if new.image:
                 ret_dict['image'] = new.image.url
 
-            if not new.video:
+            if new.video:
                 ret_dict['video'] = new.video
 
             ret_dict['excEditor'] = new.exc_editor
@@ -253,10 +262,11 @@ def show_information(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for notice in Information.objects.all().order_by('datetime'):
+            for notice in Information.objects.all().order_by('-datetime'):
                 ele_dict = {}
                 ele_dict['title'] = notice.title
                 ele_dict['datetime'] = notice.datetime.strftime(("%Y-%m-%d %H:%M"))
+                ele_dict['viewNum'] = notice.view_num
                 ret_list.append(ele_dict)
             json_data = json.dumps({'information': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse({'information': ret_list})
@@ -269,12 +279,14 @@ def show_information(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = notice.title
             ret_dict['body'] = notice.body
-            if notice.image.url:
+            if notice.image:
                 ret_dict['image'] = notice.image.url
 
             ret_dict['excEditor'] = notice.exc_editor
             ret_dict['dutyEditor'] = notice.duty_editor
             ret_dict['viewNum'] = notice.view_num
+            if notice.video_url:
+                ret_dict['video'] = notice.video_url
             if notice.file:
                 ret_dict['attachmentUrl'] = notice.file.url
             ret_dict['datetime'] = notice.datetime.strftime(("%Y-%m-%d %H:%M"))
@@ -290,7 +302,7 @@ def show_business(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in BusinessCooperation.objects.all().order_by('datetime'):
+            for new in BusinessCooperation.objects.all().order_by('-datetime'):
                 ele_dict = {}
                 ele_dict['title'] = new.title
                 ele_dict['viewNum'] = new.view_num
@@ -307,12 +319,15 @@ def show_business(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
-            if new.image.url:
+            if new.image:
                 ret_dict['image'] = new.image.url
             ret_dict['excEditor'] = new.exc_editor
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
+            ret_dict['video'] = new.video_url
+            if new.video_url:
+                ret_dict['video'] = new.video_url
             if new.file:
                 ret_dict['attachmentUrl'] = new.file.url
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
@@ -327,7 +342,7 @@ def show_contact(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in ForeignContact.objects.all().order_by('datetime'):
+            for new in ForeignContact.objects.all().order_by('-datetime'):
                 ele_dict = {}
                 ele_dict['title'] = new.title
                 ele_dict['viewNum'] = new.view_num
@@ -344,11 +359,13 @@ def show_contact(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
-            ret_dict['image'] = new.image.url
+            if new.image:
+                ret_dict['image'] = new.image.url
             ret_dict['excEditor'] = new.exc_editor
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
             ret_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
+            ret_dict['video'] = new.video_url
             if new.file:
                 ret_dict['attachmentUrl'] = new.file.url
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
@@ -464,7 +481,6 @@ def show_department(request, dynamic_dap_url=None):
                     sta_dict['introduction'] = staff.introduction
                     sta_dict['department'] = staff.department.name
                     sta_dict['chef_flag'] = staff.chef_flag
-                    sta_dict['imageUrl'] = staff.image.url
                     staff_list.append(sta_dict)
                 news = department.x_news_set.all()
                 news_list = []
@@ -480,8 +496,8 @@ def show_department(request, dynamic_dap_url=None):
                     act_dict = {}
                     act_dict['title'] = activity.name
                     activity_list.append(act_dict)
-                chef = Chef.objects.get(if_chef_now=True)
-                json_data = json.dumps({'chef': chef.name, 'staffs': staff_list, 'news': news_list, 'activity': activity_list},
+                chef = department.chef_set.all().filter(if_chef_now=True)
+                json_data = json.dumps({'chef': chef[0].name, 'staffs': staff_list, 'news': news_list, 'activity': activity_list},
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
 
@@ -495,11 +511,8 @@ def show_department(request, dynamic_dap_url=None):
                 staff_dict['introduction'] = staff.introduction
                 staff_dict['department'] = staff.department.name
                 staff_dict['chef_flag'] = staff.chef_flag
-                staff_dict['imageUrl'] = staff.image.url
-
                 staff_dict['phone'] = staff.telephone
                 staff_dict['email'] = staff.e_mail
-
                 json_data = json.dumps(staff_dict,
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
@@ -513,15 +526,14 @@ def show_department(request, dynamic_dap_url=None):
 
                 chef_dict['introduction'] = chef.introduction
                 chef_dict['department'] = chef.department.name
-                chef_dict['chef_now'] = chef.chef_now
-                chef_dict['imageUrl'] = chef.image.url
+                chef_dict['if_chef_now'] = chef.if_chef_now
                 json_data = json.dumps(chef_dict,
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
 
             elif department_name[1] == 'chefs':
                 department = Department.objects.get(name=department_name[0])
-                chefs = department.chef_set.all().order_by('datetime')
+                chefs = department.chef_set.all().order_by('-datetime')
                 chefs_dict = {}
                 chefs_list = []
                 for chef in chefs:
@@ -533,7 +545,7 @@ def show_department(request, dynamic_dap_url=None):
                     chefs_dict['phone'] = chef.telephone
                     chefs_dict['email'] = chef.e_mail
                     chefs_list.append(chefs_dict)
-                json_data = json.dumps({'chefs': chefs_dict},
+                json_data = json.dumps({'chefs': chefs_list},
                                        ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
 
@@ -559,14 +571,8 @@ def show_academy(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in Academy.objects.all().order_by('datetime'):
+            for new in Academy.objects.all().order_by('-datetime'):
                 ele_dict = {}
-                # deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
-                # if deltatime.days >= 7:
-                #     new_flag = False
-                # else:
-                #     new_flag = True
-                # ele_dict['newFlag'] = new_flag
                 ele_dict['title'] = new.title
                 ele_dict['url'] = new.url
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
@@ -598,12 +604,12 @@ def show_rights(request, dynamic_news_url=None):
             ret_list = []
             for new in Rights.objects.all().order_by('datetime')[0:3]:
                 ele_dict = {}
-                # deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
-                # if deltatime.days >= 7:
-                #     new_flag = False
-                # else:
-                #     new_flag = True
-                # ele_dict['newFlag'] = new_flag
+                deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
+                if deltatime.days >= 7:
+                    new_flag = False
+                else:
+                    new_flag = True
+                ele_dict['newFlag'] = new_flag
                 ele_dict['title'] = new.title
                 ele_dict['url'] = new.url
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d-%H:%M"))
@@ -634,19 +640,18 @@ def show_thoughts(request, dynamic_news_url=None):
             ret_list = []
             for new in Thoughts.objects.all().order_by('datetime')[0:3]:
                 ele_dict = {}
-                # deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
-                # if deltatime.days >= 7:
-                #     new_flag = False
-                # else:
-                #     new_flag = True
-                # ele_dict['newFlag'] = new_flag
+                deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
+                if deltatime.days >= 7:
+                    new_flag = False
+                else:
+                    new_flag = True
+                ele_dict['newFlag'] = new_flag
                 ele_dict['title'] = new.title
                 ele_dict['url'] = new.url
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d-%H:%M"))
                 ele_dict['text'] = new.text
                 ret_list.append(ele_dict)
             json_data = json.dumps({'thoughts': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
-            # return JsonResponse({'news': ret_list})
             return HttpResponse(json_data, content_type="application/json")
 
         else:
@@ -657,7 +662,6 @@ def show_thoughts(request, dynamic_news_url=None):
             ret_dict['title'] = thought.title
             ret_dict['datetime'] = thought.datetime.strftime(("%Y-%m-%d %H:%M"))
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
-            # return JsonResponse(ret_dict)
             return HttpResponse(json_file, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
@@ -670,12 +674,12 @@ def show_stars(request, dynamic_url=None):
             ret_list = []
             for new in Star.objects.all()[0:3]:
                 ele_dict = {}
-                # deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
-                # if deltatime.days >= 7:
-                #     new_flag = False
-                # else:
-                #     new_flag = True
-                # ele_dict['newFlag'] = new_flag
+                deltatime = datetime.now() - new.datetime.replace(tzinfo=None)
+                if deltatime.days >= 7:
+                    new_flag = False
+                else:
+                    new_flag = True
+                ele_dict['newFlag'] = new_flag
                 ele_dict['content'] = new.content
                 ele_dict['url'] = new.image.url
                 ele_dict['text'] = new.text
@@ -688,7 +692,8 @@ def show_stars(request, dynamic_url=None):
             ret_dict = {}
             star = Star.objects.get(content=dynamic_url)
             ret_dict['content'] = star.content
-            ret_dict['image'] = star.image.url
+            if star.image:
+                ret_dict['image'] = star.image.url
             ret_dict['text'] = star.text
             json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             # return JsonResponse(ret_dict)
@@ -707,11 +712,19 @@ def show_schools(request, dynamic_url=None):
                 ele_dict['introduction'] = school.introduction
                 ele_dict['chef'] = school.chef
                 ele_dict['chef_introduction'] = school.chef_introduction
+                if school.image:
+                    ele_dict['image'] = school.image.url
+                    ele_dict['video'] = school.video_url
                 ret_list.append(ele_dict)
-            system_brief_image = SomeElse.objects.all()[0].school_system_brief_image.url
-            system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
-            json_data = json.dumps({'schools': ret_list, 'system_brief_image': system_brief_image,
-                                    'system_brief_text':system_brief_text}, ensure_ascii=False, sort_keys=True, indent=4)
+            ret_dict={}
+            ret_dict['schools'] = ret_list
+            if SomeElse.objects.all():
+                system_brief_image = SomeElse.objects.all()[0].school_system_brief_image.url
+                ret_dict['system_brief_image'] = system_brief_image
+            if SomeElse.objects.all():
+                system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
+                ret_dict['system_brief_text'] = system_brief_text
+            json_data = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
             return HttpResponse(json_data, content_type="application/json")
 
         else:
@@ -723,18 +736,27 @@ def show_schools(request, dynamic_url=None):
                 ret_dict['introcduction'] = school.introduction
                 ret_dict['chef'] = school.chef
                 ret_dict['chef_introduction'] = school.chef_introduction
+                if school.image:
+                    ret_dict['image'] = school.image.url
+                    ret_dict['video'] = school.video_url
                 json_file = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_file, content_type="application/json")
             else:
-                system_brief_image = SomeElse.objects.all()[0].school_system_brief_image.url
-                system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
-                json_data = json.dumps({'system_brief_image': system_brief_image, 'system_brief_text':system_brief_text}
-                                       , ensure_ascii=False, sort_keys=True, indent=4)
+                ret_dict={}
+                if SomeElse.objects.all():
+                    system_brief_image = SomeElse.objects.all()[0].school_system_brief_image.url
+                    ret_dict['system_brief_image'] = system_brief_image
+                    system_brief_text = SomeElse.objects.all()[0].school_system_brief_text
+                    ret_dict['system_brief_text'] = system_brief_text
+                    system_brief_video = SomeElse.objects.all()[0].school_system_brief_video
+                    ret_dict['system_brief_video'] = system_brief_video
+                json_data = json.dumps(ret_dict, ensure_ascii=False, sort_keys=True, indent=4)
                 return HttpResponse(json_data, content_type="application/json")
     else:
         return HttpResponse('fail, wrong request method')
 
 
+#  这个函数有点bug
 def show_course(request, dynamic_url=None):
     if request.method == 'GET':
         if not dynamic_url:
@@ -770,14 +792,13 @@ def show_course_information(request, dynamic_news_url=None):
         if not dynamic_news_url:
             # 动态url为空的情况，赋予列表
             ret_list = []
-            for new in CourseInformation.objects.all().order_by('datetime'):
+            for new in CourseInformation.objects.all().order_by('-datetime'):
                 ele_dict = {}
                 ele_dict['title'] = new.title
                 ele_dict['viewNum'] = new.view_num
                 ele_dict['datetime'] = new.datetime.strftime(("%Y-%m-%d %H:%M"))
                 ret_list.append(ele_dict)
             json_data = json.dumps({'courseinformation': ret_list}, ensure_ascii=False, sort_keys=True, indent=4)
-            # return JsonResponse({'contact': ret_list})
             return HttpResponse(json_data, content_type="application/json")
 
         else:
@@ -787,8 +808,9 @@ def show_course_information(request, dynamic_news_url=None):
             ret_dict = {}
             ret_dict['title'] = new.title
             ret_dict['body'] = new.body
-            if new.image.url:
+            if new.image:
                 ret_dict['image'] = new.image.url
+                ret_dict['video'] = new.video
             ret_dict['excEditor'] = new.exc_editor
             ret_dict['dutyEditor'] = new.duty_editor
             ret_dict['viewNum'] = new.view_num
@@ -805,7 +827,6 @@ def show_course_information(request, dynamic_news_url=None):
 def show_schoolUnion(request):
     if request.method == "GET":
         try:
-            school = models.ForeignKey(SchoolUnion, verbose_name="学生联合会")
             schoolUnion = SchoolUnion.objects.all()[0]
             ret_dict = {}
             ret_dict['text'] = schoolUnion.Text
@@ -825,9 +846,8 @@ def show_schoolUnion(request):
 
 def show_suChef(request):
     if request.method == "GET":
-        # suChef_list = SchoolUnion.suchef_set.all()
         chef_list = []
-        for suChef in SchoolUnion.suchef_set.all().order_by("datetime"):
+        for suChef in SchoolUnion.objects.all()[0].suchef_set.all().order_by("datetime"):
             ret_dict = {}
             ret_dict['name'] = suChef.name
             ret_dict['if_chef_now'] = suChef.if_chef_now
@@ -837,16 +857,15 @@ def show_suChef(request):
             ret_dict["telephone"] = suChef.telephone
             ret_dict["email"] = suChef.e_mail
             chef_list.append(ret_dict)
-        return JsonResponse(chef_list)
+        return JsonResponse({"suchef": chef_list})
     else:
         return HttpResponse("fail wrong method")
 
 
 def show_suStaff(request):
     if request.method == "GET":
-        # suChef_list = SchoolUnion.suchef_set.all()
         chef_list = []
-        for sustaff in SchoolUnion.sustaff_set.all():
+        for sustaff in SchoolUnion.objects.all()[0].sustaff_set.all():
             ret_dict = {}
             ret_dict['name'] = sustaff.name
             ret_dict["introduction"] = sustaff.introduction
@@ -855,22 +874,17 @@ def show_suStaff(request):
             ret_dict["telephone"] = sustaff.telephone
             ret_dict["email"] = sustaff.e_mail
             chef_list.append(ret_dict)
-        return JsonResponse(chef_list)
+        return JsonResponse({"suStaff": chef_list})
     else:
         return HttpResponse("fail wrong method")
 
 
 def show_oldPicture(request):
     if request.method == "GET":
-         photo = SchoolUnion.suphoto.photo
-         return JsonResponse({"photo": photo.photo})
+         photo = SchoolUnion.objects.all()[0].suphoto.photo
+         return JsonResponse({"photo": photo})
     else:
         return HttpResponse("wrong method")
-
-
-# class suPhoto(models.Model):
-#     shcool = models.ForeignKey(SchoolUnion, verbose_name="学生联合会历史图片")
-#     photo = models.TextField(verbose_name="历史照片")
 
 
 def upload_media(request):
@@ -901,3 +915,4 @@ def get_test_data(request):
 
 def http_exception_handler(request):
     return HttpResponse()
+

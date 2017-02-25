@@ -139,34 +139,46 @@ class CourseInformationAdmin(BaseCustomAdmin):
     pass
 
 
-class DepartmentModelAdmin(ModelAdminView):
-    model = Staff
+class suChefAdmin(BaseCustomAdmin):
+    pass
+
+class suStaffAdmin(BaseCustomAdmin):
+    pass
+
+class suPhotoAdmin(BaseCustomAdmin):
+    pass
+
+class SchoolUnionAdmin(BaseCustomAdmin):
     pass
 
 xadmin.site.register(WpPosts, WpPostsAdmin)
+xadmin.site.register(Carousel, CarouselAdmin)
+xadmin.site.register(SchoolUnion, SchoolUnionAdmin)
+xadmin.site.register(suChef, suChefAdmin)
+xadmin.site.register(suStaff, suStaffAdmin)
+xadmin.site.register(suPhoto, suPhotoAdmin)
 xadmin.site.register(Department, DepartmentAdmin)
+xadmin.site.register(Chef, ChefAdmin)
 xadmin.site.register(Staff, StaffAdmin)
 xadmin.site.register(X_news, X_newsAdmin)
 xadmin.site.register(X_activity, X_activityAdmin)
 xadmin.site.register(Information, InformationAdmin)
-xadmin.site.register(Carousel, CarouselAdmin)
-xadmin.site.register(Apply, ApplyAdmin)
-xadmin.site.register(Safeguard, SafeguardAdmin)
-xadmin.site.register(FixServer, FixServerAdmin)
 xadmin.site.register(School, SchoolAdmin)
 xadmin.site.register(S_news, S_newsAdmin)
 xadmin.site.register(SomeElse, SomeElseAdmin)
+xadmin.site.register(Apply, ApplyAdmin)
+xadmin.site.register(Safeguard, SafeguardAdmin)
+xadmin.site.register(FixServer, FixServerAdmin)
 xadmin.site.register(Star, StarAdmin)
 xadmin.site.register(WondVideo, WondVideoAdmin)
 xadmin.site.register(WondPicture, WondPictureAdmin)
 xadmin.site.register(Academy, AcademyAdmin)
 xadmin.site.register(Rights, RightsAdmin)
 xadmin.site.register(Thoughts, ThoughtsAdmin)
-xadmin.site.register(Chef, ChefAdmin)
+xadmin.site.register(CourseInformation, CourseInformationAdmin)
 xadmin.site.register(Course, CourseAdmin)
 xadmin.site.register(CourseFile, CourseFileAdmin)
 xadmin.site.register(BusinessCooperation, BusinessCooperationAdmin)
 xadmin.site.register(ForeignContact, ForeignContactAdmin)
-xadmin.site.register(CourseInformation, CourseInformationAdmin)
 xadmin.site.register(CommAdminView, GlobalSetting)
 
